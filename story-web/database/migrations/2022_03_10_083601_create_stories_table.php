@@ -13,17 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('stories', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
-            $table->string('fullname')->nullable();
-            $table->string('email')->unique();
-            $table->string('password');
+            $table->string('name');
+            $table->string('description');
             $table->string('avatar')->nullable();
-            $table->tinyInteger('sex')->nullable();
-            $table->tinyInteger('role');
-            $table->tinyInteger('active');
-            $table->rememberToken();
+            $table->bigInteger('view')->default(0);
+            $table->bigInteger('like')->default(0);
+            $table->string('slug')->nullable();
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }
@@ -35,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('stories');
     }
 };
