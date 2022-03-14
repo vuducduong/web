@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('number');
             $table->longText('content');
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }
