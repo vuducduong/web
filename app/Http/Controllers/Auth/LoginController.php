@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -22,21 +25,95 @@ class LoginController extends Controller
 
     use AuthenticatesUsers,ThrottlesLogins;
 
-
+    protected $maxAttempts = 3; // Default is 5
+    protected $decayMinutes = 2; // Default is 1
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    // /**
+    //  * Create a new controller instance.
+    //  *
+    //  * @return void
+    //  */
+    // public function __construct()
+    // {
+    //     $this->middleware('guest')->except('logout');
+    // }
+
+    public function login(Request $request) 
     {
-        $this->middleware('guest')->except('logout');
+        $this->validateLogin($request);
+
+       
+        $auth = [
+            'email' => $request->email,
+            'password' => $request->password,
+            'active' => User::ACTIVE
+        ];
+        $remember = $request->remember = 'on';
+        if(Auth::attempt($auth, $remember)) {
+            $request->session()->regenerate();
+            $user = Auth::guard()->user();
+            // Create log
+            $event = 'Login';
+            $this->createLog($event, $user);
+            return redirect()->route('home');
+        }else{
+            if (
+                
+            $this->hasTooManyLoginAttempts($request)) {
+                // dd(1);
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+            // if ($this->hasTooManyLoginAttempts($request)) {
+            //     dd(12);
+            //     $key = $this->throttleKey($request);
+            //     $rateLimiter = $this->limiter();
+
+
+            //     $limit = [3 => 10, 5 => 30];
+            //     $attempts = $rateLimiter->attempts($key);  // return how attapts already yet
+
+            //     if($attempts >= 5)
+            //     {
+            //         $rateLimiter->clear($key);;
+            //     }
+
+            //     if(array_key_exists($attempts, $limit)){
+            //         $this->decayMinutes = $limit[$attempts];
+            //     }
+                
+            //     $this->incrementLoginAttempts($request);
+
+            //     $this->fireLockoutEvent($request);
+            //     return $this->sendLockoutResponse($request);
+
+
+
+            // }
+
+            $this->incrementLoginAttempts($request);
+            return $this->sendFailedLoginResponse($request);
+        }
     }
+
+    protected function validateLogin(Request $request) {
+        $request->validate([
+            $this->username() => 'required',
+            'password' => 'required',
+        ],
+        [
+            'email.required' => 'Email không được để trống!',
+            'password.required' => 'Mật khẩu không được để trống!'
+        ]
+        );
+    }
+
 }
