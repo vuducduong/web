@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,3 +22,5 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 // Route::get('/login', [App\Http\Controllers\LoginController::class, 'login'])->name('login')->middleware("throttle:3,2");
+Route::get('auth/google', [SocialController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [SocialController::class, 'handleGoogleCallback']);

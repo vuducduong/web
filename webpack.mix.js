@@ -16,3 +16,4 @@ mix.js('resources/js/app.js', 'public/js')
     .sourceMaps();
 
 mix.sass('node_modules/@coreui/coreui/scss/coreui.scss', 'public/css')
+mix.copy('node_modules/toastr/build/toastr.min.js', 'public/js');

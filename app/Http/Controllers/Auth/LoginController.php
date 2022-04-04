@@ -23,10 +23,10 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers,ThrottlesLogins;
+    use AuthenticatesUsers, ThrottlesLogins;
 
     protected $maxAttempts = 3; // Default is 5
-    protected $decayMinutes = 2; // Default is 1
+    protected $decayMinutes = 1; // Default is 1
     /**
      * Where to redirect users after login.
      *
@@ -44,76 +44,47 @@ class LoginController extends Controller
     //     $this->middleware('guest')->except('logout');
     // }
 
-    public function login(Request $request) 
+    public function login(Request $request)
     {
         $this->validateLogin($request);
 
-       
+
         $auth = [
             'email' => $request->email,
             'password' => $request->password,
             'active' => User::ACTIVE
         ];
         $remember = $request->remember = 'on';
-        if(Auth::attempt($auth, $remember)) {
+        if (Auth::attempt($auth, $remember)) {
             $request->session()->regenerate();
             $user = Auth::guard()->user();
             // Create log
-            $event = 'Login';
-            $this->createLog($event, $user);
+            // $event = 'Login';
+            // $this->createLog($event, $user);
             return redirect()->route('home');
-        }else{
-            if (
-                
-            $this->hasTooManyLoginAttempts($request)) {
-                // dd(1);
-            $this->fireLockoutEvent($request);
+        } else {
+            if ($this->hasTooManyLoginAttempts($request)) {
 
-            return $this->sendLockoutResponse($request);
-        }
+                $this->fireLockoutEvent($request);
 
-            // if ($this->hasTooManyLoginAttempts($request)) {
-            //     dd(12);
-            //     $key = $this->throttleKey($request);
-            //     $rateLimiter = $this->limiter();
-
-
-            //     $limit = [3 => 10, 5 => 30];
-            //     $attempts = $rateLimiter->attempts($key);  // return how attapts already yet
-
-            //     if($attempts >= 5)
-            //     {
-            //         $rateLimiter->clear($key);;
-            //     }
-
-            //     if(array_key_exists($attempts, $limit)){
-            //         $this->decayMinutes = $limit[$attempts];
-            //     }
-                
-            //     $this->incrementLoginAttempts($request);
-
-            //     $this->fireLockoutEvent($request);
-            //     return $this->sendLockoutResponse($request);
-
-
-
-            // }
-
+                return $this->sendLockoutResponse($request);
+            }
             $this->incrementLoginAttempts($request);
             return $this->sendFailedLoginResponse($request);
         }
     }
 
-    protected function validateLogin(Request $request) {
-        $request->validate([
-            $this->username() => 'required',
-            'password' => 'required',
-        ],
-        [
-            'email.required' => 'Email không được để trống!',
-            'password.required' => 'Mật khẩu không được để trống!'
-        ]
+    protected function validateLogin(Request $request)
+    {
+        $request->validate(
+            [
+                $this->username() => 'required',
+                'password' => 'required',
+            ],
+            [
+                'email.required' => 'Email không được để trống!',
+                'password.required' => 'Mật khẩu không được để trống!'
+            ]
         );
     }
-
 }
