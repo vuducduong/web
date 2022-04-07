@@ -1,5 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
-    "/css/coreui.css": "/css/coreui.css"
+    "/css/coreui.css": "/css/coreui.css",
+    "/css/toastr.min.css": "/css/toastr.min.css",
+    "/js/toastr.min.js": "/js/toastr.min.js"
 }

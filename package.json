@@ -21,6 +21,8 @@
         "sass-loader": "^11.0.1"
     },
     "dependencies": {
-        "@coreui/coreui": "^4.1.2"
+        "@coreui/coreui": "^4.1.2",
+        "jquery": "^3.6.0",
+        "toastr": "^2.1.4"
     }
 }

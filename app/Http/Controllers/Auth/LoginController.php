@@ -61,6 +61,8 @@ class LoginController extends Controller
             // Create log
             // $event = 'Login';
             // $this->createLog($event, $user);
+            toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+
             return redirect()->route('home');
         } else {
             if ($this->hasTooManyLoginAttempts($request)) {
@@ -70,6 +72,8 @@ class LoginController extends Controller
                 return $this->sendLockoutResponse($request);
             }
             $this->incrementLoginAttempts($request);
+            toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+
             return $this->sendFailedLoginResponse($request);
         }
     }

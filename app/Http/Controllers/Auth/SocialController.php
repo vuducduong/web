@@ -38,17 +38,23 @@ class SocialController extends Controller
                         'user_id' => $user->id,
                     ]);
                     Auth::login(User::where('email', $googleUser->email)->first());
+                    // toastr()->success('Tài khoản đã bị vô hiệu hóa.');
+
                     return redirect()->route('home');
                 }
+                // toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+
                 return redirect()->route('login');
             }
             // Nếu đã có id đăng nhập bằng google
             elseif ($social) {
                 if ($user->active == User::ACTIVE) {
                     Auth::login(User::where('id', $social->user_id)->first());
+                    toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+
                     return redirect()->route('home');
                 }
-                toastr()->success('Tài khoản đã bị vô hiệu hóa.');
+                // toastr()->error('Tài khoản đã bị vô hiệu hóa.');
 
                 return redirect()->route('login');
             }
