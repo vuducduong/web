@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Social;
 use App\Models\User;
+use app\Traits\StoryWebLog;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
 {
+    use StoryWebLog;
     /**
      * Redirect to google oauth2
      *
@@ -38,11 +40,15 @@ class SocialController extends Controller
                         'user_id' => $user->id,
                     ]);
                     Auth::login(User::where('email', $googleUser->email)->first());
-                    // toastr()->success('Tài khoản đã bị vô hiệu hóa.');
+                    $user = Auth::guard()->user();
+                    // Create log
+                    $event = 'Login';
+                    $this->createLog($event, $user);
+                    toastr()->success('Đăng nhập thành công.');
 
                     return redirect()->route('home');
                 }
-                // toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+                toastr()->error('Tài khoản đã bị vô hiệu hóa.');
 
                 return redirect()->route('login');
             }
@@ -50,11 +56,14 @@ class SocialController extends Controller
             elseif ($social) {
                 if ($user->active == User::ACTIVE) {
                     Auth::login(User::where('id', $social->user_id)->first());
-                    toastr()->error('Tài khoản đã bị vô hiệu hóa.');
-
+                    $user = Auth::guard()->user();
+                    // Create log
+                    $event = 'Login';
+                    $this->createLog($event, $user);
+                    toastr()->success('Đăng nhập thành công.');
                     return redirect()->route('home');
                 }
-                // toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+                toastr()->error('Tài khoản đã bị vô hiệu hóa.');
 
                 return redirect()->route('login');
             }
@@ -72,7 +81,13 @@ class SocialController extends Controller
                     'name' => 'Google',
                     'user_id' => $newUser->id,
                 ]);
+
                 Auth::login($newUser);
+                $user = Auth::guard()->user();
+                // Create log
+                $event = 'Login';
+                $this->createLog($event, $user);
+                toastr()->success('Đăng nhập thành công.');
 
                 return redirect()->route('home');
             }

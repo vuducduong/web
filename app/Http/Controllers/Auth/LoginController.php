@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Traits\StoryWebLog;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers, ThrottlesLogins;
+    use AuthenticatesUsers, ThrottlesLogins, StoryWebLog;
 
     protected $maxAttempts = 3; // Default is 5
     protected $decayMinutes = 1; // Default is 1
@@ -59,9 +60,9 @@ class LoginController extends Controller
             $request->session()->regenerate();
             $user = Auth::guard()->user();
             // Create log
-            // $event = 'Login';
-            // $this->createLog($event, $user);
-            toastr()->error('Tài khoản đã bị vô hiệu hóa.');
+            $event = 'Login';
+            $this->createLog($event, $user);
+            toastr()->success('Đăng nhập thành công.');
 
             return redirect()->route('home');
         } else {
